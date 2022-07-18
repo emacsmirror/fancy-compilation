@@ -54,17 +54,15 @@ Use when `fancy-compilation-override-colors' is non-nil.")
 ;; ---------------------------------------------------------------------------
 ;; Internal Utilities
 
-(defmacro fancy-compilation--with-advice (fn-orig where fn-advice &rest body)
-  "Execute BODY with advice added.
-
-WHERE using FN-ADVICE temporarily added to FN-ORIG."
+(defmacro fancy-compilation--with-temp-hook (hook-sym fn-advice &rest body)
+  "Execute BODY with hook FN-ADVICE temporarily added to HOOK-SYM."
   `
   (let ((fn-advice-var ,fn-advice))
     (unwind-protect
       (progn
-        (advice-add ,fn-orig ,where fn-advice-var)
+        (add-hook ,hook-sym fn-advice-var)
         ,@body)
-      (advice-remove ,fn-orig fn-advice-var))))
+      (remove-hook ,hook-sym fn-advice-var))))
 
 
 ;; ---------------------------------------------------------------------------
@@ -101,12 +99,17 @@ WHERE using FN-ADVICE temporarily added to FN-ORIG."
   "Wrap `compilation-start' (F ARGS)."
   (cond
     (fancy-compilation-quiet-prelude
-      (fancy-compilation--with-advice 'insert
-        :override (lambda (&rest _args) nil)
-        (fancy-compilation--with-advice 'put-text-property
-          :override (lambda (&rest _args) nil)
-          ;; Call the function without any additional text.
-          (apply f args))))
+      (let ((compile-buf nil))
+        (fancy-compilation--with-temp-hook 'compilation-start-hook
+          (lambda (proc) (setq compile-buf (process-buffer proc)))
+
+          (prog1 (apply f args)
+            (when compile-buf
+              (with-current-buffer compile-buf
+                ;; Ideally this text would not be added in the first place,
+                ;; but overriding `insert' causes #2 (issues with native-compilation).
+                (let ((inhibit-read-only t))
+                  (delete-region (point-min) (point-max)))))))))
     (t
       (apply f args))))
 
