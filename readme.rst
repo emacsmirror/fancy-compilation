@@ -59,6 +59,9 @@ Customization
 ``fancy-compilation-quiet-prelude``: t
    Suppress text such as "Compilation Started" which is otherwise included before compilation output.
 
+``fancy-compilation-quiet-prolog``: t
+   Use brief text output when compilation has completed.
+
 
 Hints
 =====

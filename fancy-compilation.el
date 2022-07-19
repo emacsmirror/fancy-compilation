@@ -48,7 +48,11 @@
 Use when `fancy-compilation-override-colors' is non-nil.")
 
 (defcustom fancy-compilation-quiet-prelude t
-  "Clear text inserted before compilation starts."
+  "Suppress text inserted before compilation starts."
+  :type 'boolean)
+
+(defcustom fancy-compilation-quiet-prolog t
+  "Use less verbose text upon completing compilation."
   :type 'boolean)
 
 
@@ -65,6 +69,17 @@ Use when `fancy-compilation-override-colors' is non-nil.")
         ,@body)
       (remove-hook ,hook-sym fn-advice-var))))
 
+(defun fancy-compilation--bounds-of-space-at-point (pos)
+  "Return the range of space characters surrounding POS."
+  (save-excursion
+    (let ((skip "[:blank:]\n"))
+      (goto-char pos)
+      (skip-chars-backward skip)
+      (cons
+        (point)
+        (progn
+          (skip-chars-forward skip)
+          (point))))))
 
 ;; ---------------------------------------------------------------------------
 ;; Internal Functions
@@ -116,6 +131,52 @@ Use when `fancy-compilation-override-colors' is non-nil.")
     (t
       (apply fn args))))
 
+(defun fancy-compilation--compilation-handle-exit (fn process-status exit-status msg)
+  "Wrap `compilation-handle-exit' (FN PROCESS-STATUS, EXIT-STATUS & MSG)."
+  (cond
+    (fancy-compilation-quiet-prolog
+      (let ((pos-orig (point)))
+        (prog1 (funcall fn process-status exit-status msg)
+          (pcase-let
+            ((`(,trim-beg . ,trim-end) (fancy-compilation--bounds-of-space-at-point pos-orig)))
+
+            (let ((inhibit-read-only t))
+              (delete-region trim-beg trim-end)
+
+              (goto-char trim-beg)
+              (insert "\n")
+              (save-match-data
+                (when
+                  (or
+                    (looking-at "[[:alnum:]]+ [[:alnum:]]+\\( at .*\\)")
+                    (re-search-forward "\\( at .*\\)"))
+                  (delete-region (match-beginning 1) (match-end 1))))
+
+              (let ((tail (car (fancy-compilation--bounds-of-space-at-point (point-max)))))
+                (delete-region tail (point-max)))
+
+              ;; Overlays are needed since compilation mode will overwrite the `face'.
+              (when fancy-compilation-override-colors
+                (let
+                  (
+                    (hl-face
+                      (list
+                        :background
+                        (cond
+                          ((zerop exit-status)
+                            (face-attribute 'ansi-color-green :foreground))
+                          (t
+                            (face-attribute 'ansi-color-red :foreground)))
+                        :foreground (face-attribute 'ansi-color-black :foreground)
+                        :extend t)))
+                  (let ((overlay (make-overlay (1+ trim-beg) (point-max))))
+                    (overlay-put overlay 'evaporate t)
+                    (overlay-put overlay 'after-string (propertize "\n" 'face hl-face))
+                    (overlay-put overlay 'face hl-face)))))))))
+
+    (t
+      (funcall fn process-status exit-status msg))))
+
 (defun fancy-compilation--compilation-filter (fn proc string)
   "Wrap `compilation-filter' (FN PROC STRING) to support `ansi-color'."
   (let ((buf (process-buffer proc)))
@@ -136,6 +197,7 @@ Use when `fancy-compilation-override-colors' is non-nil.")
   (advice-add 'compile :around #'fancy-compilation--compile)
   (advice-add 'compilation-filter :around #'fancy-compilation--compilation-filter)
   (advice-add 'compilation-start :around #'fancy-compilation--compilation-start)
+  (advice-add 'compilation-handle-exit :around #'fancy-compilation--compilation-handle-exit)
   (add-hook 'compilation-mode-hook #'fancy-compilation--compilation-mode))
 
 (defun fancy-compilation-mode-disable ()
@@ -143,6 +205,7 @@ Use when `fancy-compilation-override-colors' is non-nil.")
   (advice-remove 'compile #'fancy-compilation--compile)
   (advice-remove 'compilation-filter #'fancy-compilation--compilation-filter)
   (advice-remove 'compilation-start #'fancy-compilation--compilation-start)
+  (advice-remove 'compilation-handle-exit #'fancy-compilation--compilation-handle-exit)
   (remove-hook 'compilation-mode-hook #'fancy-compilation--compilation-mode))
 
 (defun fancy-compilation-mode-turn-on ()
