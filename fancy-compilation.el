@@ -22,9 +22,10 @@
 
 ;;; Code:
 
-(require 'ansi-color)
+(eval-when-compile
+  (require 'compile)
+  (require 'ansi-color))
 
-(eval-when-compile (require 'compile))
 
 ;; ---------------------------------------------------------------------------
 ;; Custom Variables
@@ -97,6 +98,8 @@ Use when `fancy-compilation-override-colors' is non-nil.")
 
 (defun fancy-compilation--compilation-start (f &rest args)
   "Wrap `compilation-start' (F ARGS)."
+  ;; Lazily load when not compiling.
+  (require 'ansi-color)
   (cond
     (fancy-compilation-quiet-prelude
       (let ((compile-buf nil))
