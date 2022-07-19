@@ -51,16 +51,49 @@ Customization
    The ``TERM`` environment variable to use (set to an empty string to leave unset).
 
 ``fancy-compilation-override-colors``: t
-   Override theme faces (foreground/background).
+   Override faces & colors when enabled.
 
-``fancy-compilation-default-face``
-   The face to use for default text when ``fancy-compilation-override-colors`` is enabled.
+   *This is useful in case colors used by the compiler output such as bright yellow
+   that wont read well on a light background for example.*
 
 ``fancy-compilation-quiet-prelude``: t
    Suppress text such as "Compilation Started" which is otherwise included before compilation output.
 
 ``fancy-compilation-quiet-prolog``: t
    Use brief text output when compilation has completed.
+
+
+Faces
+-----
+
+These faces are used when ``fancy-compilation-override-colors`` is enabled.
+
+``fancy-compilation-default-face``
+   This face is used for the primary foreground and background *(defaulting to grey on a black background).*
+
+``fancy-compilation-function-name-face``
+   Face used to replace ``font-lock-function-name-face``.
+
+``fancy-compilation-line-number-face``
+   Face used to replace ``compilation-line-number``.
+
+``fancy-compilation-column-number-face``
+   Face used to replace ``compilation-column-number``.
+
+``fancy-compilation-info-face``
+   Face used to replace ``compilation-info``.
+
+``fancy-compilation-warning-face``
+   Face used to replace ``compilation-warning``.
+
+``fancy-compilation-error-face``
+   Face used to replace ``compilation-error``.
+
+``fancy-compilation-complete-success-face``
+   Face used to show completion success.
+
+``fancy-compilation-complete-error-face``
+   Face used to show completion failure.
 
 
 Hints
