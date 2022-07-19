@@ -83,8 +83,8 @@ Use when `fancy-compilation-override-colors' is non-nil.")
   ;; A margin doesn't make sense for compilation output.
   (setq-local scroll-margin 0))
 
-(defun fancy-compilation--compile (f &rest args)
-  "Wrap the `compile' command (F ARGS)."
+(defun fancy-compilation--compile (fn &rest args)
+  "Wrap the `compile' command (FN ARGS)."
   (let
     (
       (compilation-environment
@@ -93,11 +93,11 @@ Use when `fancy-compilation-override-colors' is non-nil.")
             compilation-environment)
           (t
             (cons (concat "TERM=" fancy-compilation-term) compilation-environment)))))
-    (apply f args)))
+    (apply fn args)))
 
 
-(defun fancy-compilation--compilation-start (f &rest args)
-  "Wrap `compilation-start' (F ARGS)."
+(defun fancy-compilation--compilation-start (fn &rest args)
+  "Wrap `compilation-start' (FN ARGS)."
   ;; Lazily load when not compiling.
   (require 'ansi-color)
   (cond
@@ -106,7 +106,7 @@ Use when `fancy-compilation-override-colors' is non-nil.")
         (fancy-compilation--with-temp-hook 'compilation-start-hook
           (lambda (proc) (setq compile-buf (process-buffer proc)))
 
-          (prog1 (apply f args)
+          (prog1 (apply fn args)
             (when compile-buf
               (with-current-buffer compile-buf
                 ;; Ideally this text would not be added in the first place,
@@ -114,14 +114,14 @@ Use when `fancy-compilation-override-colors' is non-nil.")
                 (let ((inhibit-read-only t))
                   (delete-region (point-min) (point-max)))))))))
     (t
-      (apply f args))))
+      (apply fn args))))
 
-(defun fancy-compilation--compilation-filter (f proc string)
-  "Wrap `compilation-filter' (F PROC STRING) to support `ansi-color'."
+(defun fancy-compilation--compilation-filter (fn proc string)
+  "Wrap `compilation-filter' (FN PROC STRING) to support `ansi-color'."
   (let ((buf (process-buffer proc)))
     (when (buffer-live-p buf)
       (with-current-buffer buf
-        (funcall f proc string)
+        (funcall fn proc string)
         (let ((inhibit-read-only t))
           ;; Rely on `ansi-color-context-region' to avoid re-coloring
           ;; the entire buffer every update.
