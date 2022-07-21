@@ -16,6 +16,8 @@ This is a minimalist package that enhances ``compilation-mode`` in the following
    :scale: 50 %
    :align: center
 
+Available via `melpa <https://melpa.org/#/fancy-compilation>`__.
+
 
 Motivation
 ==========
@@ -34,14 +36,7 @@ This package was written to conveniently support these as well as other minor qu
 Usage
 =====
 
-This can be lazily loaded after ``compile``.
-
-.. code-block:: elisp
-
-   (with-eval-after-load 'compile
-     (fancy-compilation-mode))
-
-Once this global mode is enabled, calling ``compile`` will use enhancements from this package.
+Once ``fancy-compilation-mode`` is enabled, calling ``compile`` will use enhancements from this package.
 
 
 Customization
@@ -94,6 +89,20 @@ These faces are used when ``fancy-compilation-override-colors`` is enabled.
 
 ``fancy-compilation-complete-error-face``
    Face used to show completion failure.
+
+
+Installation
+============
+
+The package is available in melpa as ``fancy-compilation``, here is an example with ``use-package``:
+
+.. code-block:: elisp
+
+   (use-package fancy-compilation
+     :commands (fancy-compilation-mode))
+
+   (with-eval-after-load 'compile
+     (fancy-compilation-mode))
 
 
 Hints
