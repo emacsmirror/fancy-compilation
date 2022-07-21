@@ -185,10 +185,10 @@
   "Wrap `compilation-handle-exit' (FN PROCESS-STATUS, EXIT-STATUS & MSG)."
   (cond
     (fancy-compilation-quiet-prolog
-      (let ((pos-orig (point)))
+      (let ((eof-orig (point-max)))
         (prog1 (funcall fn process-status exit-status msg)
           (pcase-let
-            ((`(,trim-beg . ,trim-end) (fancy-compilation--bounds-of-space-at-point pos-orig)))
+            ((`(,trim-beg . ,trim-end) (fancy-compilation--bounds-of-space-at-point eof-orig)))
 
             (let ((inhibit-read-only t))
               (delete-region trim-beg trim-end)
