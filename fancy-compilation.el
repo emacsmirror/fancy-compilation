@@ -92,6 +92,12 @@
 
 
 ;; ---------------------------------------------------------------------------
+;; Internal Variables
+
+;; The window used for compilation (not essential, use when set & live).
+(defvar-local fancy-compilation--window nil)
+
+;; ---------------------------------------------------------------------------
 ;; Internal Utilities
 
 (defmacro fancy-compilation--with-temp-hook (hook-sym fn-advice &rest body)
@@ -158,21 +164,22 @@
   "Wrap `compilation-start' (FN ARGS)."
   ;; Lazily load when not compiling.
   (require 'ansi-color)
-  (cond
-    (fancy-compilation-quiet-prelude
-      (let ((compile-buf nil))
-        (fancy-compilation--with-temp-hook 'compilation-start-hook
-          (lambda (proc) (setq compile-buf (process-buffer proc)))
+  (setq fancy-compilation--window nil)
 
-          (prog1 (apply fn args)
-            (when compile-buf
-              (with-current-buffer compile-buf
-                ;; Ideally this text would not be added in the first place,
-                ;; but overriding `insert' causes #2 (issues with native-compilation).
-                (let ((inhibit-read-only t))
-                  (delete-region (point-min) (point-max)))))))))
-    (t
-      (apply fn args))))
+  (let ((compile-buf nil))
+    (fancy-compilation--with-temp-hook 'compilation-start-hook
+      (lambda (proc) (setq compile-buf (process-buffer proc)))
+
+      (prog1 (apply fn args)
+        (when compile-buf
+          (with-current-buffer compile-buf
+            (setq fancy-compilation--window (get-buffer-window compile-buf))
+
+            (when fancy-compilation-quiet-prelude
+              ;; Ideally this text would not be added in the first place,
+              ;; but overriding `insert' causes #2 (issues with native-compilation).
+              (let ((inhibit-read-only t))
+                (delete-region (point-min) (point-max))))))))))
 
 (defun fancy-compilation--compilation-handle-exit (fn process-status exit-status msg)
   "Wrap `compilation-handle-exit' (FN PROCESS-STATUS, EXIT-STATUS & MSG)."
@@ -225,7 +232,17 @@
         (let ((inhibit-read-only t))
           ;; Rely on `ansi-color-context-region' to avoid re-coloring
           ;; the entire buffer every update.
-          (ansi-color-apply-on-region (point-min) (point-max)))))))
+          (ansi-color-apply-on-region (point-min) (point-max))
+
+          ;; Avoid the horizontal scroll getting "stuck",
+          ;; always snap back to the left hand side.
+          (when fancy-compilation--window
+            (cond
+              ((window-live-p fancy-compilation--window)
+                (unless (zerop (window-hscroll))
+                  (set-window-hscroll fancy-compilation--window 0)))
+              (t ;; Don't further check this window.
+                (setq fancy-compilation--window nil)))))))))
 
 
 ;; ---------------------------------------------------------------------------
@@ -245,7 +262,9 @@
   (advice-remove 'compilation-filter #'fancy-compilation--compilation-filter)
   (advice-remove 'compilation-start #'fancy-compilation--compilation-start)
   (advice-remove 'compilation-handle-exit #'fancy-compilation--compilation-handle-exit)
-  (remove-hook 'compilation-mode-hook #'fancy-compilation--compilation-mode))
+  (remove-hook 'compilation-mode-hook #'fancy-compilation--compilation-mode)
+
+  (kill-local-variable 'fancy-compilation--window))
 
 (defun fancy-compilation-mode-turn-on ()
   "Enable command `fancy-compilation-mode'."
