@@ -153,7 +153,7 @@
     (
       (compilation-environment
         (cond
-          ((string-empty-p compilation-environment)
+          ((string-empty-p fancy-compilation-term)
             compilation-environment)
           (t
             (cons (concat "TERM=" fancy-compilation-term) compilation-environment)))))
