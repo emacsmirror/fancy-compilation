@@ -57,6 +57,18 @@ Customization
 ``fancy-compilation-quiet-prolog``: t
    Use brief text output when compilation has completed.
 
+``fancy-compilation-setup-hook``: nil
+   Hooks run just after the fancy-compilation buffer has been initialized.
+   Use this to set or override defaults.
+
+   The following example shows how ``compilation-scroll-output`` can be disabled.
+
+   .. code-block:: elisp
+
+      (add-hook 'fancy-compilation-setup-hook
+        (lambda ()
+          (setq compilation-scroll-output nil))))
+
 
 Faces
 -----

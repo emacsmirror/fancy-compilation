@@ -50,6 +50,10 @@
   "Use less verbose text upon completing compilation."
   :type 'boolean)
 
+(defcustom fancy-compilation-setup-hook nil
+  "Hooks run just after the fancy-compilation buffer has been initialized.
+Use this to set or override defaults."
+  :type 'hook)
 
 ;; ---------------------------------------------------------------------------
 ;; Faces
@@ -145,7 +149,9 @@
   ;; Avoid jumping past the last line when correcting scroll.
   (setq-local scroll-conservatively most-positive-fixnum)
   ;; A margin doesn't make sense for compilation output.
-  (setq-local scroll-margin 0))
+  (setq-local scroll-margin 0)
+
+  (run-hooks 'fancy-compilation-setup-hook))
 
 (defun fancy-compilation--compile (fn &rest args)
   "Wrap the `compile' command (FN ARGS)."
