@@ -272,11 +272,6 @@ Use this to set or override defaults."
 
   (kill-local-variable 'fancy-compilation--window))
 
-(defun fancy-compilation-mode-turn-on ()
-  "Enable command `fancy-compilation-mode'."
-  (when (and (not (minibufferp)) (not (bound-and-true-p fancy-compilation-mode)))
-    (fancy-compilation-mode 1)))
-
 
 ;; ---------------------------------------------------------------------------
 ;; Public API
