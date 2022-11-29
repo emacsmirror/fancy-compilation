@@ -254,7 +254,7 @@ Use this to set or override defaults."
 ;; ---------------------------------------------------------------------------
 ;; Internal Mode Management
 
-(defun fancy-compilation-mode-enable ()
+(defun fancy-compilation--mode-enable ()
   "Turn on `fancy-compilation-mode' for the current buffer."
   (advice-add 'compile :around #'fancy-compilation--compile)
   (advice-add 'compilation-filter :around #'fancy-compilation--compilation-filter)
@@ -262,7 +262,7 @@ Use this to set or override defaults."
   (advice-add 'compilation-handle-exit :around #'fancy-compilation--compilation-handle-exit)
   (add-hook 'compilation-mode-hook #'fancy-compilation--compilation-mode))
 
-(defun fancy-compilation-mode-disable ()
+(defun fancy-compilation--mode-disable ()
   "Turn off `fancy-compilation-mode' for the current buffer."
   (advice-remove 'compile #'fancy-compilation--compile)
   (advice-remove 'compilation-filter #'fancy-compilation--compilation-filter)
@@ -283,9 +283,9 @@ Use this to set or override defaults."
 
   (cond
     (fancy-compilation-mode
-      (fancy-compilation-mode-enable))
+      (fancy-compilation--mode-enable))
     (t
-      (fancy-compilation-mode-disable))))
+      (fancy-compilation--mode-disable))))
 
 
 (provide 'fancy-compilation)
