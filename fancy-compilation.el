@@ -62,28 +62,22 @@ Use this to set or override defaults."
   (list (list t :background "black" :inherit 'ansi-color-grey))
   "Face used to render black color.")
 
-(defface fancy-compilation-function-name-face
-  (list (list t :foreground "cyan3"))
+(defface fancy-compilation-function-name-face (list (list t :foreground "cyan3"))
   "Face used to show function names.")
 
-(defface fancy-compilation-line-number-face
-  (list (list t :foreground "cyan3"))
+(defface fancy-compilation-line-number-face (list (list t :foreground "cyan3"))
   "Face used to show line numbers.")
 
-(defface fancy-compilation-column-number-face
-  (list (list t :foreground "cyan3"))
+(defface fancy-compilation-column-number-face (list (list t :foreground "cyan3"))
   "Face used to show column numbers.")
 
-(defface fancy-compilation-info-face
-  (list (list t :foreground "cyan3"))
+(defface fancy-compilation-info-face (list (list t :foreground "cyan3"))
   "Face used to show info text.")
 
-(defface fancy-compilation-warning-face
-  (list (list t :foreground "yellow3"))
+(defface fancy-compilation-warning-face (list (list t :foreground "yellow3"))
   "Face used to show error text.")
 
-(defface fancy-compilation-error-face
-  (list (list t :foreground "dark orange"))
+(defface fancy-compilation-error-face (list (list t :foreground "dark orange"))
   "Face used to show error text.")
 
 (defface fancy-compilation-complete-success-face
