@@ -100,13 +100,13 @@ Use this to set or override defaults."
 
 (defmacro fancy-compilation--with-temp-hook (hook-sym fn-advice &rest body)
   "Execute BODY with hook FN-ADVICE temporarily added to HOOK-SYM."
-  `
-  (let ((fn-advice-var ,fn-advice))
-    (unwind-protect
-      (progn
-        (add-hook ,hook-sym fn-advice-var)
-        ,@body)
-      (remove-hook ,hook-sym fn-advice-var))))
+  (declare (indent 2))
+  `(let ((fn-advice-var ,fn-advice))
+     (unwind-protect
+         (progn
+           (add-hook ,hook-sym fn-advice-var)
+           ,@body)
+       (remove-hook ,hook-sym fn-advice-var))))
 
 (defun fancy-compilation--bounds-of-space-at-point (pos)
   "Return the range of space characters surrounding POS."
@@ -115,10 +115,10 @@ Use this to set or override defaults."
       (goto-char pos)
       (skip-chars-backward skip)
       (cons
-        (point)
-        (progn
-          (skip-chars-forward skip)
-          (point))))))
+       (point)
+       (progn
+         (skip-chars-forward skip)
+         (point))))))
 
 ;; ---------------------------------------------------------------------------
 ;; Internal Functions
@@ -127,14 +127,14 @@ Use this to set or override defaults."
   "Mode hook to set buffer local defaults."
   (when fancy-compilation-override-colors
     (setq-local face-remapping-alist
-      (list
-        (cons 'default 'fancy-compilation-default-face)
-        (cons 'font-lock-function-name-face 'fancy-compilation-function-name-face)
-        (cons 'compilation-line-number 'fancy-compilation-line-number-face)
-        (cons 'compilation-column-number 'fancy-compilation-column-number-face)
-        (cons 'compilation-info 'fancy-compilation-info-face)
-        (cons 'compilation-warning 'fancy-compilation-warning-face)
-        (cons 'compilation-error 'fancy-compilation-error-face))))
+                (list
+                 (cons 'default 'fancy-compilation-default-face)
+                 (cons 'font-lock-function-name-face 'fancy-compilation-function-name-face)
+                 (cons 'compilation-line-number 'fancy-compilation-line-number-face)
+                 (cons 'compilation-column-number 'fancy-compilation-column-number-face)
+                 (cons 'compilation-info 'fancy-compilation-info-face)
+                 (cons 'compilation-warning 'fancy-compilation-warning-face)
+                 (cons 'compilation-error 'fancy-compilation-error-face))))
 
   ;; Needed so `ansi-text' isn't converted to [...].
   (setq-local compilation-max-output-line-length nil)
@@ -149,14 +149,12 @@ Use this to set or override defaults."
 
 (defun fancy-compilation--compile (fn &rest args)
   "Wrap the `compile' command (FN ARGS)."
-  (let
-    (
-      (compilation-environment
-        (cond
+  (let ((compilation-environment
+         (cond
           ((string-empty-p fancy-compilation-term)
-            compilation-environment)
+           compilation-environment)
           (t
-            (cons (concat "TERM=" fancy-compilation-term) compilation-environment)))))
+           (cons (concat "TERM=" fancy-compilation-term) compilation-environment)))))
     (apply fn args)))
 
 
@@ -168,7 +166,7 @@ Use this to set or override defaults."
 
   (let ((compile-buf nil))
     (fancy-compilation--with-temp-hook 'compilation-start-hook
-      (lambda (proc) (setq compile-buf (process-buffer proc)))
+        (lambda (proc) (setq compile-buf (process-buffer proc)))
 
       (prog1 (apply fn args)
         (when compile-buf
@@ -184,44 +182,40 @@ Use this to set or override defaults."
 (defun fancy-compilation--compilation-handle-exit (fn process-status exit-status msg)
   "Wrap `compilation-handle-exit' (FN PROCESS-STATUS, EXIT-STATUS & MSG)."
   (cond
-    (fancy-compilation-quiet-prolog
-      (let ((eof-orig (point-max)))
-        (prog1 (funcall fn process-status exit-status msg)
-          (pcase-let
-            ((`(,trim-beg . ,trim-end) (fancy-compilation--bounds-of-space-at-point eof-orig)))
+   (fancy-compilation-quiet-prolog
+    (let ((eof-orig (point-max)))
+      (prog1 (funcall fn process-status exit-status msg)
+        (pcase-let ((`(,trim-beg . ,trim-end)
+                     (fancy-compilation--bounds-of-space-at-point eof-orig)))
 
-            (let ((inhibit-read-only t))
-              (delete-region trim-beg trim-end)
+          (let ((inhibit-read-only t))
+            (delete-region trim-beg trim-end)
 
-              (goto-char trim-beg)
-              (insert "\n")
-              (save-match-data
-                (when
-                  (or
-                    (looking-at "[[:alnum:]]+ [[:alnum:]]+\\( at .*\\)")
-                    (re-search-forward "\\( at .*\\)"))
-                  (delete-region (match-beginning 1) (match-end 1))))
+            (goto-char trim-beg)
+            (insert "\n")
+            (save-match-data
+              (when (or (looking-at "[[:alnum:]]+ [[:alnum:]]+\\( at .*\\)")
+                        (re-search-forward "\\( at .*\\)"))
+                (delete-region (match-beginning 1) (match-end 1))))
 
-              (let ((tail (car (fancy-compilation--bounds-of-space-at-point (point-max)))))
-                (delete-region tail (point-max)))
+            (let ((tail (car (fancy-compilation--bounds-of-space-at-point (point-max)))))
+              (delete-region tail (point-max)))
 
-              ;; Overlays are needed since compilation mode will overwrite the `face'.
-              (when fancy-compilation-override-colors
-                (let
-                  (
-                    (complete-face
-                      (cond
-                        ((zerop exit-status)
-                          'fancy-compilation-complete-success-face)
-                        (t
-                          'fancy-compilation-complete-error-face))))
-                  (let ((overlay (make-overlay (1+ trim-beg) (point-max))))
-                    (overlay-put overlay 'evaporate t)
-                    (overlay-put overlay 'after-string (propertize "\n" 'face complete-face))
-                    (overlay-put overlay 'face complete-face)))))))))
+            ;; Overlays are needed since compilation mode will overwrite the `face'.
+            (when fancy-compilation-override-colors
+              (let ((complete-face
+                     (cond
+                      ((zerop exit-status)
+                       'fancy-compilation-complete-success-face)
+                      (t
+                       'fancy-compilation-complete-error-face))))
+                (let ((overlay (make-overlay (1+ trim-beg) (point-max))))
+                  (overlay-put overlay 'evaporate t)
+                  (overlay-put overlay 'after-string (propertize "\n" 'face complete-face))
+                  (overlay-put overlay 'face complete-face)))))))))
 
-    (t
-      (funcall fn process-status exit-status msg))))
+   (t
+    (funcall fn process-status exit-status msg))))
 
 (defun fancy-compilation--compilation-filter (fn proc string)
   "Wrap `compilation-filter' (FN PROC STRING) to support `ansi-color'."
@@ -238,11 +232,11 @@ Use this to set or override defaults."
           ;; always snap back to the left hand side.
           (when fancy-compilation--window
             (cond
-              ((window-live-p fancy-compilation--window)
-                (unless (zerop (window-hscroll))
-                  (set-window-hscroll fancy-compilation--window 0)))
-              (t ;; Don't further check this window.
-                (setq fancy-compilation--window nil)))))))))
+             ((window-live-p fancy-compilation--window)
+              (unless (zerop (window-hscroll))
+                (set-window-hscroll fancy-compilation--window 0)))
+             (t ;; Don't further check this window.
+              (setq fancy-compilation--window nil)))))))))
 
 
 ;; ---------------------------------------------------------------------------
@@ -276,10 +270,10 @@ Use this to set or override defaults."
   :global t
 
   (cond
-    (fancy-compilation-mode
-      (fancy-compilation--mode-enable))
-    (t
-      (fancy-compilation--mode-disable))))
+   (fancy-compilation-mode
+    (fancy-compilation--mode-enable))
+   (t
+    (fancy-compilation--mode-disable))))
 
 
 (provide 'fancy-compilation)
