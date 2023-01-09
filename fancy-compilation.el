@@ -278,6 +278,7 @@ Use this to set or override defaults."
 
 (provide 'fancy-compilation)
 ;; Local Variables:
+;; fill-column: 99
 ;; indent-tabs-mode: nil
 ;; End:
 ;;; fancy-compilation.el ends here
