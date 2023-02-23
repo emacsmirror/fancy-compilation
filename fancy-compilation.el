@@ -55,6 +55,13 @@
 Use this to set or override defaults."
   :type 'hook)
 
+(defcustom fancy-compilation-scroll-output t
+  "Like `compilation-scroll-output`, but defaults to `t` and specific to `fancy-compilation`."
+  :type '(choice (const :tag "No scrolling" nil)
+		 (const :tag "Scroll compilation output" t)
+		 (const :tag "Stop scrolling at the first error" first-error)))
+
+
 ;; ---------------------------------------------------------------------------
 ;; Faces
 
@@ -139,7 +146,7 @@ Use this to set or override defaults."
   ;; Needed so `ansi-text' isn't converted to [...].
   (setq-local compilation-max-output-line-length nil)
   ;; Auto-scroll output.
-  (setq-local compilation-scroll-output t)
+  (setq-local compilation-scroll-output fancy-compilation-scroll-output)
   ;; Avoid jumping past the last line when correcting scroll.
   (setq-local scroll-conservatively most-positive-fixnum)
   ;; A margin doesn't make sense for compilation output.
