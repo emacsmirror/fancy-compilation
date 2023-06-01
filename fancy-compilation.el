@@ -240,7 +240,7 @@ Use this to set or override defaults."
           (when fancy-compilation--window
             (cond
              ((window-live-p fancy-compilation--window)
-              (unless (zerop (window-hscroll))
+              (unless (zerop (window-hscroll fancy-compilation--window))
                 (set-window-hscroll fancy-compilation--window 0)))
              (t ; Don't further check this window.
               (setq fancy-compilation--window nil)))))))))
