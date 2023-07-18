@@ -58,9 +58,10 @@ Use this to set or override defaults."
 
 (defcustom fancy-compilation-scroll-output t
   "Like `compilation-scroll-output`, but defaults to `t` and specific to `fancy-compilation`."
-  :type '(choice (const :tag "No scrolling" nil)
-		 (const :tag "Scroll compilation output" t)
-		 (const :tag "Stop scrolling at the first error" first-error)))
+  :type
+  '(choice (const :tag "No scrolling" nil)
+           (const :tag "Scroll compilation output" t)
+           (const :tag "Stop scrolling at the first error" first-error)))
 
 
 ;; ---------------------------------------------------------------------------
@@ -288,5 +289,6 @@ Use this to set or override defaults."
 ;; Local Variables:
 ;; fill-column: 99
 ;; indent-tabs-mode: nil
+;; elisp-autofmt-format-quoted: nil
 ;; End:
 ;;; fancy-compilation.el ends here
