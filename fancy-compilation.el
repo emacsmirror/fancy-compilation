@@ -34,7 +34,8 @@
   "Options to configure enhanced compilation settings."
   :group 'convenience)
 
-(defcustom fancy-compilation-term "tmux-256color"
+;; Follow the default for `ansi-term'.
+(defcustom fancy-compilation-term "eterm-color"
   "The TERM environment variable to use (use an empty string to disable)."
   :type 'string)
 
