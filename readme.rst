@@ -42,7 +42,7 @@ Once ``fancy-compilation-mode`` is enabled, calling ``compile`` will use enhance
 Customization
 -------------
 
-``fancy-compilation-term``: ``"tmux-256color"``
+``fancy-compilation-term``: ``"eterm-color"``
    The ``TERM`` environment variable to use (set to an empty string to leave unset).
 
 ``fancy-compilation-override-colors``: t
