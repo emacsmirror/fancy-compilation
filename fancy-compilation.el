@@ -24,7 +24,10 @@
 
 (eval-when-compile
   (require 'compile)
-  (require 'ansi-color))
+  (require 'ansi-color)
+
+  ;; Quiet byte-code compilation warning.
+  (declare-function ansi-color-apply-on-region "diff-ansi"))
 
 
 ;; ---------------------------------------------------------------------------
