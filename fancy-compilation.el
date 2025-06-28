@@ -158,6 +158,8 @@ Use this to set or override defaults."
   (setq-local scroll-conservatively most-positive-fixnum)
   ;; A margin doesn't make sense for compilation output.
   (setq-local scroll-margin 0)
+  ;; Faster output (see !30).
+  (setq-local process-adaptive-read-buffering nil)
 
   (run-hooks 'fancy-compilation-setup-hook))
 
