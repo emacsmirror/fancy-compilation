@@ -72,33 +72,42 @@ Use this to set or override defaults."
 
 (defface fancy-compilation-default-face
   (list (list t :background "black" :inherit 'ansi-color-white))
-  "Face used to render black color.")
+  "Face used to render black color."
+  :group 'fancy-compilation)
 
 (defface fancy-compilation-function-name-face (list (list t :foreground "cyan3"))
-  "Face used to show function names.")
+  "Face used to show function names."
+  :group 'fancy-compilation)
 
 (defface fancy-compilation-line-number-face (list (list t :foreground "cyan3"))
-  "Face used to show line numbers.")
+  "Face used to show line numbers."
+  :group 'fancy-compilation)
 
 (defface fancy-compilation-column-number-face (list (list t :foreground "cyan3"))
-  "Face used to show column numbers.")
+  "Face used to show column numbers."
+  :group 'fancy-compilation)
 
 (defface fancy-compilation-info-face (list (list t :foreground "cyan3"))
-  "Face used to show info text.")
+  "Face used to show info text."
+  :group 'fancy-compilation)
 
 (defface fancy-compilation-warning-face (list (list t :foreground "yellow3"))
-  "Face used to show error text.")
+  "Face used to show error text."
+  :group 'fancy-compilation)
 
 (defface fancy-compilation-error-face (list (list t :foreground "dark orange"))
-  "Face used to show error text.")
+  "Face used to show error text."
+  :group 'fancy-compilation)
 
 (defface fancy-compilation-complete-success-face
   (list (list t :foreground "black" :inherit 'ansi-color-green :extend t))
-  "Face used to show success on completion.")
+  "Face used to show success on completion."
+  :group 'fancy-compilation)
 
 (defface fancy-compilation-complete-error-face
   (list (list t :foreground "black" :inherit 'ansi-color-red :extend t))
-  "Face used to show success on completion.")
+  "Face used to show success on completion."
+  :group 'fancy-compilation)
 
 
 ;; ---------------------------------------------------------------------------
