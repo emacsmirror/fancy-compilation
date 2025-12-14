@@ -27,7 +27,7 @@
   (require 'ansi-color)
 
   ;; Quiet byte-code compilation warning.
-  (declare-function ansi-color-apply-on-region "diff-ansi"))
+  (declare-function ansi-color-apply-on-region "ansi-color"))
 
 
 ;; ---------------------------------------------------------------------------
