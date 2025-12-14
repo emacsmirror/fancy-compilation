@@ -122,12 +122,14 @@ Use this to set or override defaults."
 (defmacro fancy-compilation--with-temp-hook (hook-sym fn-advice &rest body)
   "Execute BODY with hook FN-ADVICE temporarily added to HOOK-SYM."
   (declare (indent 2))
-  `(let ((fn-advice-var ,fn-advice))
-     (unwind-protect
-         (progn
-           (add-hook ,hook-sym fn-advice-var)
-           ,@body)
-       (remove-hook ,hook-sym fn-advice-var))))
+  (let ((fn-var (gensym "fn-advice-")))
+    `(let ((,fn-var ,fn-advice))
+       (unwind-protect
+           (progn
+             (add-hook ,hook-sym ,fn-var)
+             ,@body)
+         (remove-hook ,hook-sym ,fn-var)))))
+
 
 (defun fancy-compilation--bounds-of-space-at-point (pos)
   "Return the range of space characters surrounding POS."
