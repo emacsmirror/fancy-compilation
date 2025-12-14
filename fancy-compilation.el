@@ -15,7 +15,7 @@
 ;; This package aims to bring some of the default behavior of compiling
 ;; from a terminal into Emacs, setting defaults accordingly.
 
-;;; Usage
+;;; Usage:
 
 ;; (fancy-compilation-mode) ; Activate for future compilation.
 
@@ -72,7 +72,7 @@ Use this to set or override defaults."
 
 (defface fancy-compilation-default-face
   (list (list t :background "black" :inherit 'ansi-color-white))
-  "Face used to render black color."
+  "Face used to display default text."
   :group 'fancy-compilation)
 
 (defface fancy-compilation-function-name-face (list (list t :foreground "cyan3"))
@@ -92,7 +92,7 @@ Use this to set or override defaults."
   :group 'fancy-compilation)
 
 (defface fancy-compilation-warning-face (list (list t :foreground "yellow3"))
-  "Face used to show error text."
+  "Face used to show warning text."
   :group 'fancy-compilation)
 
 (defface fancy-compilation-error-face (list (list t :foreground "dark orange"))
@@ -106,7 +106,7 @@ Use this to set or override defaults."
 
 (defface fancy-compilation-complete-error-face
   (list (list t :foreground "black" :inherit 'ansi-color-red :extend t))
-  "Face used to show success on completion."
+  "Face used to show error on completion."
   :group 'fancy-compilation)
 
 
@@ -161,7 +161,7 @@ Use this to set or override defaults."
                  (cons 'compilation-warning 'fancy-compilation-warning-face)
                  (cons 'compilation-error 'fancy-compilation-error-face))))
 
-  ;; Needed so `ansi-text' isn't converted to [...].
+  ;; Needed so ANSI-text isn't converted to [...].
   (setq-local compilation-max-output-line-length nil)
   ;; Auto-scroll output.
   (setq-local compilation-scroll-output fancy-compilation-scroll-output)
@@ -169,13 +169,14 @@ Use this to set or override defaults."
   (setq-local scroll-conservatively most-positive-fixnum)
   ;; A margin doesn't make sense for compilation output.
   (setq-local scroll-margin 0)
-  ;; Faster output (see !30).
+  ;; Disable adaptive buffering for faster output (see PR !30).
   (setq-local process-adaptive-read-buffering nil)
 
   (run-hooks 'fancy-compilation-setup-hook))
 
 (defun fancy-compilation--compile (fn &rest args)
-  "Wrap the `compile' command (FN ARGS)."
+  "Wrap `compile' to inject TERM environment variable.
+FN is the original `compile' function, ARGS are its arguments."
   (declare (important-return-value nil))
   (let ((compilation-environment
          (cond
@@ -187,7 +188,8 @@ Use this to set or override defaults."
 
 
 (defun fancy-compilation--compilation-start (fn &rest args)
-  "Wrap `compilation-start' (FN ARGS)."
+  "Wrap `compilation-start' to initialize buffer and optionally clear prelude text.
+FN is the original `compilation-start' function, ARGS are its arguments."
   (declare (important-return-value nil))
   ;; Lazily load when not compiling.
   (require 'ansi-color)
@@ -274,7 +276,7 @@ Use this to set or override defaults."
 ;; Internal Mode Management
 
 (defun fancy-compilation--mode-enable ()
-  "Turn on `fancy-compilation-mode' for the current buffer."
+  "Enable `fancy-compilation-mode' by adding advice and hooks."
   (declare (important-return-value nil))
   (advice-add 'compile :around #'fancy-compilation--compile)
   (advice-add 'compilation-filter :around #'fancy-compilation--compilation-filter)
@@ -283,7 +285,7 @@ Use this to set or override defaults."
   (add-hook 'compilation-mode-hook #'fancy-compilation--compilation-mode))
 
 (defun fancy-compilation--mode-disable ()
-  "Turn off `fancy-compilation-mode' for the current buffer."
+  "Disable `fancy-compilation-mode' by removing advice and hooks."
   (declare (important-return-value nil))
   (advice-remove 'compile #'fancy-compilation--compile)
   (advice-remove 'compilation-filter #'fancy-compilation--compilation-filter)
